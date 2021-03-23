@@ -28,7 +28,13 @@ private:
 	bool drawingActive = false;
 	bool objectDrawn = false;
 	bool movingObject = false;
+
 	bool fillaction = false;
+
+	//Curves
+	bool bezierCurve = false;
+	bool hermiteCurve = false;
+	bool coonsCurve = false;
 
 	QVector<QPoint> points;
 
@@ -76,14 +82,21 @@ private slots:
 	void on_actionClear_triggered();
 	void on_actionSet_background_color_triggered();
 
+	void on_pushButtonDraw_clicked();
+	void on_pushButtonColorPalette_clicked();
+
 	//transformations
 
-	void on_pushButtonColorPalette_clicked();
-	void on_pushButtonDraw_clicked();
 	void on_pushButtonPolygone_clicked();
 	void on_pushButtonClear_clicked();
 	void on_pushButtonRotate_clicked(); 
 	void on_pushButtonScale_clicked(); 
 	void on_pushButtonShear_clicked(); 
 	void on_pushButtonSymetry_clicked();
+
+	//Curves
+
+	void on_pushButtonHermite_clicked();
+	void on_pushButtonBezier_clicked();
+	void on_pushButtonCoons_clicked();
 };

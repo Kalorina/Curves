@@ -60,6 +60,16 @@ public:
 	QColor Barycentric(QVector<QPoint> points, QPoint p, QColor color, QColor c1, QColor c2, QColor c3);
 	QColor interpolationPixel(QString interpolation, QVector<QPoint> points, QPoint p, QColor color, QColor c1, QColor c2, QColor c3);
 
+	//Curves
+
+	void drawPoints(QVector<QPoint> points);
+	void hermiteCurve(QVector<QPoint> points, int numberOfpoints, double degree);
+	QVector<QPoint> findTangent(QVector<QPoint> points);
+
+	void bezierCurve(QVector<QPoint> points);
+
+	void coonsCurve(QVector<QPoint> points);
+
 	void clear(QColor color = Qt::white);
 
 public slots:

@@ -13,9 +13,10 @@ ImageViewer::ImageViewer(QWidget* parent)
 	openNewTabForImg(new ViewerWidget(name, QSize(width, height)));
 	ui->tabWidget->setCurrentIndex(ui->tabWidget->count() - 1);
 
-	//ui->groupBoxSetUp->setDisabled(true);
-	ui->groupBoxTransformations->setDisabled(true);
-	ui->groupBoxCurves->setDisabled(true);
+	ui->groupBoxSetUp->setDisabled(true);
+
+	//ui->groupBoxCurves->setDisabled(true);
+
 }
 
 //ViewerWidget functions
@@ -75,8 +76,15 @@ bool ImageViewer::ViewerWidgetEventFilter(QObject* obj, QEvent* event)
 void ImageViewer::ViewerWidgetMouseButtonPress(ViewerWidget* w, QEvent* event)
 {
 	QMouseEvent* e = static_cast<QMouseEvent*>(event);
+	
+	if (e->button() == Qt::LeftButton)
+	{
+		points.append(e->pos());
+	}
 
-	if (drawingActive)
+	w->drawPoints(points);
+
+	/*if (drawingActive)
 	{
 		if (e->button() == Qt::LeftButton)
 		{
@@ -108,7 +116,7 @@ void ImageViewer::ViewerWidgetMouseButtonPress(ViewerWidget* w, QEvent* event)
 				lastMovePoint = e->pos();
 			}
 		}
-	}
+	}*/
 }
 void ImageViewer::ViewerWidgetMouseButtonRelease(ViewerWidget* w, QEvent* event)
 {
@@ -353,7 +361,6 @@ void ImageViewer::on_actionSet_background_color_triggered()
 	}
 }
 
-//Transformations
 
 void ImageViewer::on_pushButtonColorPalette_clicked()
 {
@@ -372,6 +379,9 @@ void ImageViewer::on_pushButtonDraw_clicked()
 	ui->groupBoxCurves->setEnabled(true);
 
 }
+
+//Transformations
+
 void ImageViewer::on_pushButtonPolygone_clicked()
 {
 	polygoneMode = true;
@@ -380,14 +390,23 @@ void ImageViewer::on_pushButtonPolygone_clicked()
 void ImageViewer::on_pushButtonClear_clicked()
 {
 	clearImage();
-	polygoneMode = false;
-	drawingActive = false;
-	objectDrawn = false;
-	ui->pushButtonPolygone->setEnabled(true);
-	ui->groupBoxTransformations->setDisabled(true);
-	ui->pushButtonDraw->setEnabled(true);
-	points.clear();
 
+	//polygoneMode = false;
+	//drawingActive = false;
+	//objectDrawn = false;
+	//ui->pushButtonPolygone->setEnabled(true);
+	//ui->groupBoxTransformations->setDisabled(true);
+	//ui->pushButtonDraw->setEnabled(true);
+
+	ui->pushButtonHermite->setEnabled(true);
+	ui->pushButtonBezier->setEnabled(true);
+	ui->pushButtonCoons->setEnabled(true);
+
+	bezierCurve = false;
+	hermiteCurve = false;
+	coonsCurve = false;
+
+	points.clear();
 }
 void ImageViewer::on_pushButtonRotate_clicked()
 {
@@ -419,7 +438,7 @@ void ImageViewer::on_pushButtonRotate_clicked()
 		}
 	}
 
-	qDebug() << points;
+	//qDebug() << points;
 
 	w->draw(points, color, ui->comboBoxAlg->currentText(), ui->comboBoxInterpolation->currentText(), ui->checkBoxFill->isChecked());
 }
@@ -479,3 +498,39 @@ void ImageViewer::on_pushButtonSymetry_clicked()
 
 	w->draw(points, color, ui->comboBoxAlg->currentText(), ui->comboBoxInterpolation->currentText(), ui->checkBoxFill->isChecked());
 }
+
+//Curves
+
+void ImageViewer::on_pushButtonHermite_clicked()
+{
+	ViewerWidget* w = getCurrentViewerWidget();
+
+	ui->pushButtonHermite->setDisabled(true);
+	ui->pushButtonBezier->setDisabled(true);
+	ui->pushButtonCoons->setDisabled(true);
+
+	//w->hermiteCurve(points);
+}
+
+void ImageViewer::on_pushButtonBezier_clicked()
+{
+	ViewerWidget* w = getCurrentViewerWidget();
+
+	ui->pushButtonHermite->setDisabled(true);
+	ui->pushButtonBezier->setDisabled(true);
+	ui->pushButtonCoons->setDisabled(true);
+
+	w->bezierCurve(points);
+}
+
+void ImageViewer::on_pushButtonCoons_clicked()
+{
+	ViewerWidget* w = getCurrentViewerWidget();
+
+	ui->pushButtonHermite->setDisabled(true);
+	ui->pushButtonBezier->setDisabled(true);
+	ui->pushButtonCoons->setDisabled(true);
+
+	w->coonsCurve(points);
+}
+

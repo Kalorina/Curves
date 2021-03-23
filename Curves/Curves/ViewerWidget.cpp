@@ -882,6 +882,125 @@ void ViewerWidget::draw(QVector<QPoint> points, QColor color, QString algorithm,
 	update();
 }
 
+void ViewerWidget::drawPoints(QVector<QPoint> points)
+{
+	QColor color = QColor("red");
+	for (int i = 0; i < points.size(); i++)
+	{
+		setPixel(points[i].x(), points[i].y(), color);
+	}
+}
+
+void ViewerWidget::hermiteCurve(QVector<QPoint> points, int numberOfpoints, double degree)
+{
+	if (points.size() < 2) { return; }
+	else 
+	{
+		QVector<QPoint> tangentVectors;
+
+
+	}
+
+}
+
+QVector<QPoint> ViewerWidget::findTangent(QVector<QPoint> points)
+{
+	QVector<QPoint> tangents;
+	double x, y, dx, dy, dif;
+
+
+	for (int i = 0; i < points.size(); i++)
+	{
+		x = points[i].x(), y = points[i].y(); 
+	}
+
+	return tangents;
+}
+
+void ViewerWidget::bezierCurve(QVector<QPoint> points)
+{
+	if (points.size() < 3) { return; }
+	else
+	{
+		int n = points.size();
+
+		QVector<QVector<QPoint>> polynoms(n); //Bernsteinove bazove polynomy
+		QVector<QPoint> curveQ(2); 
+		QColor color = QColor("blue");
+
+		qDebug() << points;
+
+		for (int i = 0; i < n; i++)
+		{
+			polynoms[0].append(points[i]);
+		}
+
+		double deltaT = 0.0001; double t = deltaT;
+		curveQ[0] = points[0];
+		
+		while (t < 1)
+		{
+			for (int i = 1; i < n; i++)
+			{	
+				for (int j = 0; j < n-i; j++)
+				{	
+					
+					polynoms[i].push_back((1 - t) * polynoms[i - 1][j] + t * polynoms[i - 1][j + 1]);
+				}
+			}
+
+			curveQ[1] = polynoms[n - 1][0];
+			drawLineDDA(curveQ[0], curveQ[1], color);
+			curveQ[0] = curveQ[1];
+			polynoms[n - 1].clear();
+			t += deltaT;
+		}
+
+		drawLineDDA(curveQ[0], points[n - 1], color);
+	}
+
+	drawPoints(points);
+}
+
+void ViewerWidget::coonsCurve(QVector<QPoint> points)
+{
+	int n = points.size();
+	QColor color = QColor("blue");
+
+	if (n < 4) { return; }
+	else
+	{
+		QVector<QPoint> curveQ(2);
+
+		double deltaT = 0.01; double t = 0;
+
+		for (int i = 3; i < n; i++)
+		{
+			double b0 = -1 / 6 * (t * t * t) + 1 / 2 * (t * t) - 1 / 2 * t + 1 / 6;
+			double b1 = 1 / 2 * (t * t * t) - (t * t) + 2 / 3;
+			double b2 = -1 / 2 * (t * t * t) + 1 / 2 * (t * t) + 1 / 2 * t + 1 / 6;
+			double b3 = 1 / 6 * (t * t * t);
+
+			curveQ[0] = points[i - 3] * b0 + points[i - 2] * b1 + points[i - 1] * b2 + points[i] * b3;
+
+			while (t < 1)
+			{
+				t += deltaT;
+
+				b0 = -1 / 6 * (t * t * t) + 1 / 2 * (t * t) - 1 / 2 * t + 1 / 6;
+				b1 = 1 / 2 * (t * t * t) - (t * t) + 2 / 3;
+				b2 = -1 / 2 * (t * t * t) + 1 / 2 * (t * t) + 1 / 2 * t + 1 / 6;
+				b3 = 1 / 6 * (t * t * t);
+
+				curveQ[1]= points[i - 3] * b0 + points[i - 2] * b1 + points[i - 1] * b2 + points[i] * b3;
+
+				drawLineDDA(curveQ[0], curveQ[1], color);
+				curveQ[0] = curveQ[1];
+			}
+		}
+	}
+}
+
 void ViewerWidget::clear(QColor color)
 {
 	for (size_t x = 0; x < img->width(); x++)
