@@ -67,8 +67,6 @@ private:
 	//Inline functions
 	inline bool isImgOpened() { return ui->tabWidget->count() == 0 ? false : true; }
 
-	void drawPoints();
-
 private slots:
 	//Tabs slots
 	void on_tabWidget_tabCloseRequested(int tabId);
@@ -99,4 +97,5 @@ private slots:
 	void on_pushButtonHermite_clicked();
 	void on_pushButtonBezier_clicked();
 	void on_pushButtonCoons_clicked();
+
 };

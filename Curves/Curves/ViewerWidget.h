@@ -11,7 +11,7 @@ private:
 	QRgb* data = nullptr;
 	QPainter* painter = nullptr;
 
-
+	QVector<QPoint> tangentVectors;
 public:
 	ViewerWidget(QString viewerName, QSize imgSize, QWidget* parent = Q_NULLPTR);
 	~ViewerWidget();
@@ -63,8 +63,7 @@ public:
 	//Curves
 
 	void drawPoints(QVector<QPoint> points);
-	void hermiteCurve(QVector<QPoint> points, int numberOfpoints, double degree);
-	QVector<QPoint> findTangent(QVector<QPoint> points);
+	void hermiteCurve(QVector<QPoint> points, int index, double degree);
 
 	void bezierCurve(QVector<QPoint> points);
 

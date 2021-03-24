@@ -76,13 +76,12 @@ bool ImageViewer::ViewerWidgetEventFilter(QObject* obj, QEvent* event)
 void ImageViewer::ViewerWidgetMouseButtonPress(ViewerWidget* w, QEvent* event)
 {
 	QMouseEvent* e = static_cast<QMouseEvent*>(event);
-	
+
 	if (e->button() == Qt::LeftButton)
 	{
 		points.append(e->pos());
+		w->setPixel(points.last().x(), points.last().y(), color);
 	}
-
-	w->drawPoints(points);
 
 	/*if (drawingActive)
 	{
@@ -121,11 +120,13 @@ void ImageViewer::ViewerWidgetMouseButtonPress(ViewerWidget* w, QEvent* event)
 void ImageViewer::ViewerWidgetMouseButtonRelease(ViewerWidget* w, QEvent* event)
 {
 	QMouseEvent* e = static_cast<QMouseEvent*>(event);
+	QColor color = QColor("red");
 
 	if (e->button() == Qt::LeftButton)
 	{
 		movingObject = false;
 	}
+
 }
 void ImageViewer::ViewerWidgetMouseMove(ViewerWidget* w, QEvent* event)
 {
@@ -256,9 +257,7 @@ void ImageViewer::on_tabWidget_tabCloseRequested(int tabId)
 	delete vW; //vW->~ViewerWidget();
 	ui->tabWidget->removeTab(tabId);
 }
-void ImageViewer::drawPoints()
-{
-}
+
 void ImageViewer::on_actionRename_triggered()
 {
 	if (!isImgOpened()) {
@@ -505,13 +504,22 @@ void ImageViewer::on_pushButtonHermite_clicked()
 {
 	ViewerWidget* w = getCurrentViewerWidget();
 
-	ui->pushButtonHermite->setDisabled(true);
 	ui->pushButtonBezier->setDisabled(true);
 	ui->pushButtonCoons->setDisabled(true);
 
-	//w->hermiteCurve(points);
-}
+	clearImage();
 
+	if (ui->spinBox->value() < points.size())
+	{
+		w->hermiteCurve(points, ui->spinBox->value(), ui->doubleSpinBox->value());
+	}
+	else 
+	{
+		msgBox.setText("Don't have enough points.");
+		msgBox.exec();
+		ui->pushButtonHermite->setDisabled(true);
+	}
+}
 void ImageViewer::on_pushButtonBezier_clicked()
 {
 	ViewerWidget* w = getCurrentViewerWidget();
@@ -522,7 +530,6 @@ void ImageViewer::on_pushButtonBezier_clicked()
 
 	w->bezierCurve(points);
 }
-
 void ImageViewer::on_pushButtonCoons_clicked()
 {
 	ViewerWidget* w = getCurrentViewerWidget();
