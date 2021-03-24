@@ -159,7 +159,7 @@ void ImageViewer::ViewerWidgetWheel(ViewerWidget* w, QEvent* event)
 {
 	QWheelEvent* wheelEvent = static_cast<QWheelEvent*>(event);
 
-	double factorDown = 0.75;
+	/*double factorDown = 0.75;
 	double factorUp = 1.25;
 
 	clearImage();
@@ -183,6 +183,7 @@ void ImageViewer::ViewerWidgetWheel(ViewerWidget* w, QEvent* event)
 	}
 
 	w->draw(points, color, ui->comboBoxAlg->currentText(), ui->comboBoxInterpolation->currentText(), ui->checkBoxFill->isChecked());
+	*/
 }
 
 //ImageViewer Events
