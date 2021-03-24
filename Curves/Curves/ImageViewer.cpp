@@ -5,17 +5,16 @@ ImageViewer::ImageViewer(QWidget* parent)
 {
 	ui->setupUi(this);
 
-	ui->menuBar->setDisabled(true);
+	/*ui->menuBar->setDisabled(true);
 
 	int width = 500;
 	int height = 500;
 	QString name = "Scatch";
 	openNewTabForImg(new ViewerWidget(name, QSize(width, height)));
-	ui->tabWidget->setCurrentIndex(ui->tabWidget->count() - 1);
+	ui->tabWidget->setCurrentIndex(ui->tabWidget->count() - 1);*/
 
 	ui->groupBoxSetUp->setDisabled(true);
-
-	//ui->groupBoxCurves->setDisabled(true);
+	ui->groupBoxCurves->setDisabled(true);
 
 }
 
@@ -76,11 +75,18 @@ bool ImageViewer::ViewerWidgetEventFilter(QObject* obj, QEvent* event)
 void ImageViewer::ViewerWidgetMouseButtonPress(ViewerWidget* w, QEvent* event)
 {
 	QMouseEvent* e = static_cast<QMouseEvent*>(event);
+	QColor color2 = QColor("red");
 
 	if (e->button() == Qt::LeftButton)
 	{
 		points.append(e->pos());
-		w->setPixel(points.last().x(), points.last().y(), color);
+		QPoint p; p.setX(e->pos().x()); p.setY(e->pos().y());
+		w->setPixel(p.x(), p.y(), color2);
+		w->setPixel(p.x() + 1, p.y(), color2);
+		w->setPixel(p.x() - 1, p.y(), color2);
+		w->setPixel(p.x(), p.y() + 1, color2);
+		w->setPixel(p.x(), p.y() - 1, color2);
+		w->update();
 	}
 
 	/*if (drawingActive)
@@ -120,11 +126,18 @@ void ImageViewer::ViewerWidgetMouseButtonPress(ViewerWidget* w, QEvent* event)
 void ImageViewer::ViewerWidgetMouseButtonRelease(ViewerWidget* w, QEvent* event)
 {
 	QMouseEvent* e = static_cast<QMouseEvent*>(event);
-	QColor color = QColor("red");
+	QColor color2 = QColor("red");
 
 	if (e->button() == Qt::LeftButton)
 	{
-		movingObject = false;
+		//movingObject = false;
+		QPoint p; p.setX(e->pos().x()); p.setY(e->pos().y());
+		w->setPixel(p.x(), p.y(), color2);
+		w->setPixel(p.x() + 1, p.y(), color2);
+		w->setPixel(p.x() - 1, p.y(), color2);
+		w->setPixel(p.x(), p.y() + 1, color2);
+		w->setPixel(p.x(), p.y() - 1, color2);
+		w->update();
 	}
 
 }
@@ -294,7 +307,9 @@ void ImageViewer::newImageAccepted()
 	openNewTabForImg(new ViewerWidget(name, QSize(width, height)));
 	ui->tabWidget->setCurrentIndex(ui->tabWidget->count() - 1);
 
-	ui->groupBoxSetUp->setEnabled(true);
+	//ui->groupBoxSetUp->setEnabled(true);
+	ui->groupBoxCurves->setEnabled(true);
+
 }
 void ImageViewer::on_actionOpen_triggered()
 {
@@ -401,10 +416,6 @@ void ImageViewer::on_pushButtonClear_clicked()
 	ui->pushButtonHermite->setEnabled(true);
 	ui->pushButtonBezier->setEnabled(true);
 	ui->pushButtonCoons->setEnabled(true);
-
-	bezierCurve = false;
-	hermiteCurve = false;
-	coonsCurve = false;
 
 	points.clear();
 }
@@ -518,7 +529,9 @@ void ImageViewer::on_pushButtonHermite_clicked()
 	{
 		msgBox.setText("Don't have enough points.");
 		msgBox.exec();
-		ui->pushButtonHermite->setDisabled(true);
+		ui->pushButtonHermite->setEnabled(true);
+		ui->pushButtonBezier->setEnabled(true);
+		ui->pushButtonCoons->setEnabled(true);
 	}
 }
 void ImageViewer::on_pushButtonBezier_clicked()
@@ -529,7 +542,18 @@ void ImageViewer::on_pushButtonBezier_clicked()
 	ui->pushButtonBezier->setDisabled(true);
 	ui->pushButtonCoons->setDisabled(true);
 
-	w->bezierCurve(points);
+	if (ui->spinBox->value() < points.size())
+	{
+		w->bezierCurve(points);
+	}
+	else
+	{
+		msgBox.setText("Don't have enough points.");
+		msgBox.exec();
+		ui->pushButtonHermite->setEnabled(true);
+		ui->pushButtonBezier->setEnabled(true);
+		ui->pushButtonCoons->setEnabled(true);
+	}
 }
 void ImageViewer::on_pushButtonCoons_clicked()
 {
@@ -539,6 +563,17 @@ void ImageViewer::on_pushButtonCoons_clicked()
 	ui->pushButtonBezier->setDisabled(true);
 	ui->pushButtonCoons->setDisabled(true);
 
-	w->coonsCurve(points);
+	if (ui->spinBox->value() < points.size())
+	{
+		w->coonsCurve(points);
+	}
+	else
+	{
+		msgBox.setText("Don't have enough points.");
+		msgBox.exec();
+		ui->pushButtonHermite->setEnabled(true);
+		ui->pushButtonBezier->setEnabled(true);
+		ui->pushButtonCoons->setEnabled(true);
+	}
 }
 

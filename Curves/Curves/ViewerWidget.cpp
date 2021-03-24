@@ -903,8 +903,8 @@ void ViewerWidget::hermiteCurve(QVector<QPoint> points, int index, double degree
 		{
 			for (int i = 0; i < points.size(); i++)
 			{
-				QPoint a; a.setX(points[i].x()); a.setY(points[i].y() + 150);
-				tangentVectors.append(a);
+				QPoint c; c.setX(points[i].x()); c.setY(points[i].y() + 150);
+				tangentVectors.append(c);
 			}
 		}
 		else
@@ -924,15 +924,12 @@ void ViewerWidget::hermiteCurve(QVector<QPoint> points, int index, double degree
 				tangentVectors[index].setX(a * qCos(degree * M_PI / 180) + b * qSin(degree * M_PI / 180) + points[index].x());
 				tangentVectors[index].setY(-a * qSin(degree * M_PI / 180) + b * qCos(degree * M_PI / 180) + points[index].y());
 			}
-			for (int i = 0; i < points.size(); i++)
-			{
-				drawLineDDA(points[i], tangentVectors[i], color2);
-			}
 		}
 
-		
-
-		qDebug() << tangentVectors;
+		for (int i = 0; i < points.size(); i++)
+		{
+			drawLineDDA(points[i], tangentVectors[i], color2);
+		}
 
 		double deltaT = 0.01; double t = 0;
 

@@ -12,6 +12,7 @@ private:
 	QPainter* painter = nullptr;
 
 	QVector<QPoint> tangentVectors;
+
 public:
 	ViewerWidget(QString viewerName, QSize imgSize, QWidget* parent = Q_NULLPTR);
 	~ViewerWidget();

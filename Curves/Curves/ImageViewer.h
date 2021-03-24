@@ -31,11 +31,6 @@ private:
 
 	bool fillaction = false;
 
-	//Curves
-	bool bezierCurve = false;
-	bool hermiteCurve = false;
-	bool coonsCurve = false;
-
 	QVector<QPoint> points;
 
 	//ViewerWidget functions
