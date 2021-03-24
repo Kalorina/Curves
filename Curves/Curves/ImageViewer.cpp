@@ -131,13 +131,6 @@ void ImageViewer::ViewerWidgetMouseButtonRelease(ViewerWidget* w, QEvent* event)
 	if (e->button() == Qt::LeftButton)
 	{
 		//movingObject = false;
-		QPoint p; p.setX(e->pos().x()); p.setY(e->pos().y());
-		w->setPixel(p.x(), p.y(), color2);
-		w->setPixel(p.x() + 1, p.y(), color2);
-		w->setPixel(p.x() - 1, p.y(), color2);
-		w->setPixel(p.x(), p.y() + 1, color2);
-		w->setPixel(p.x(), p.y() - 1, color2);
-		w->update();
 	}
 
 }
@@ -518,20 +511,21 @@ void ImageViewer::on_pushButtonHermite_clicked()
 
 	ui->pushButtonBezier->setDisabled(true);
 	ui->pushButtonCoons->setDisabled(true);
-
+	hermiteCurveDraw = true;
 	clearImage();
 
-	if (ui->spinBox->value() < points.size())
+	if (ui->spinBox->value() < points.size() && hermiteCurveDraw)
 	{
 		w->hermiteCurve(points, ui->spinBox->value(), ui->doubleSpinBox->value());
 	}
-	else 
+	else
 	{
 		msgBox.setText("Don't have enough points.");
 		msgBox.exec();
 		ui->pushButtonHermite->setEnabled(true);
 		ui->pushButtonBezier->setEnabled(true);
 		ui->pushButtonCoons->setEnabled(true);
+		clearImage();
 	}
 }
 void ImageViewer::on_pushButtonBezier_clicked()
@@ -541,8 +535,9 @@ void ImageViewer::on_pushButtonBezier_clicked()
 	ui->pushButtonHermite->setDisabled(true);
 	ui->pushButtonBezier->setDisabled(true);
 	ui->pushButtonCoons->setDisabled(true);
+	bezierCurveDraw = true;
 
-	if (ui->spinBox->value() < points.size())
+	if (bezierCurveDraw && points.size() > 2)
 	{
 		w->bezierCurve(points);
 	}
@@ -553,6 +548,7 @@ void ImageViewer::on_pushButtonBezier_clicked()
 		ui->pushButtonHermite->setEnabled(true);
 		ui->pushButtonBezier->setEnabled(true);
 		ui->pushButtonCoons->setEnabled(true);
+		clearImage();
 	}
 }
 void ImageViewer::on_pushButtonCoons_clicked()
@@ -562,8 +558,9 @@ void ImageViewer::on_pushButtonCoons_clicked()
 	ui->pushButtonHermite->setDisabled(true);
 	ui->pushButtonBezier->setDisabled(true);
 	ui->pushButtonCoons->setDisabled(true);
+	coonsCurveDraw = true;
 
-	if (ui->spinBox->value() < points.size())
+	if (points.size() > 3 && coonsCurveDraw)
 	{
 		w->coonsCurve(points);
 	}
@@ -574,6 +571,7 @@ void ImageViewer::on_pushButtonCoons_clicked()
 		ui->pushButtonHermite->setEnabled(true);
 		ui->pushButtonBezier->setEnabled(true);
 		ui->pushButtonCoons->setEnabled(true);
+		clearImage();
 	}
 }
 
