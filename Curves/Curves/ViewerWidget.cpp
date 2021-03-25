@@ -897,14 +897,16 @@ void ViewerWidget::hermiteCurve(QVector<QPoint> points, int index, double degree
 	else 
 	{
 		QColor color = QColor("blue"); QColor color2 = QColor("green");
-		QPoint q0, q1; double qx, qy, f0, f1, f2, f3;
+		QPointF q0, q1; double qx, qy, f0, f1, f2, f3;
 
-		if (tangentVectors.isEmpty())
+		
+		if (vectorEndPoints.isEmpty() && tangentVectors.isEmpty())
 		{
 			for (int i = 0; i < points.size(); i++)
 			{
 				QPoint c; c.setX(points[i].x()); c.setY(points[i].y() + 150);
-				tangentVectors.append(c);
+				vectorEndPoints.append(c);
+				tangentVectors.append(QPoint(c - points[i]));
 			}
 		}
 		else
@@ -912,23 +914,29 @@ void ViewerWidget::hermiteCurve(QVector<QPoint> points, int index, double degree
 			int a, b;
 			if (degree >= 0)
 			{
-				a = tangentVectors[index].x() - points[index].x();
-				b = tangentVectors[index].y() - points[index].y();
-				tangentVectors[index].setX(a * qCos(-degree * M_PI / 180) - b * qSin(-degree * M_PI / 180) + points[index].x());
-				tangentVectors[index].setY(a * qSin(-degree * M_PI / 180) + b * qCos(-degree * M_PI / 180) + points[index].y());
+				a = vectorEndPoints[index].x() - points[index].x();
+				b = vectorEndPoints[index].y() - points[index].y();
+				vectorEndPoints[index].setX(a * qCos(-degree * M_PI / 180) - b * qSin(-degree * M_PI / 180) + points[index].x());
+				vectorEndPoints[index].setY(a * qSin(-degree * M_PI / 180) + b * qCos(-degree * M_PI / 180) + points[index].y());
+
 			}
 			if (degree < 0)
 			{
-				a = tangentVectors[index].x() - points[index].x();
-				b = tangentVectors[index].y() - points[index].y();
-				tangentVectors[index].setX(a * qCos(degree * M_PI / 180) + b * qSin(degree * M_PI / 180) + points[index].x());
-				tangentVectors[index].setY(-a * qSin(degree * M_PI / 180) + b * qCos(degree * M_PI / 180) + points[index].y());
+				a = vectorEndPoints[index].x() - points[index].x();
+				b = vectorEndPoints[index].y() - points[index].y();
+				vectorEndPoints[index].setX(a * qCos(degree * M_PI / 180) + b * qSin(degree * M_PI / 180) + points[index].x());
+				vectorEndPoints[index].setY(-a * qSin(degree * M_PI / 180) + b * qCos(degree * M_PI / 180) + points[index].y());
+			}
+			tangentVectors.clear();
+			for (int i = 0; i < vectorEndPoints.size(); i++)
+			{
+				tangentVectors.push_back(vectorEndPoints[i] - points[i]);
 			}
 		}
 
 		for (int i = 0; i < points.size(); i++)
 		{
-			drawLineDDA(points[i], tangentVectors[i], color2);
+			drawLineDDA(points[i], vectorEndPoints[i], color2);
 		}
 
 		double deltaT = 0.01; double t = 0;
@@ -949,15 +957,16 @@ void ViewerWidget::hermiteCurve(QVector<QPoint> points, int index, double degree
 				qy = points[i - 1].y() * f0 + points[i].y() * f1 + tangentVectors[i - 1].y() * f2 + tangentVectors[i].y() * f3;
 
 				q1.setX(qx); q1.setY(qy);
-
-				drawLineDDA(q0, q1, color);
+				QPoint a; a.setX(q0.x()); a.setY(q0.y());
+				QPoint b; b.setX(q1.x()); b.setY(q1.y());
+				drawLineDDA(a, b, color);
 				
 				q0.setX(q1.x());q0.setY(q1.y());
 
 				t += deltaT;
 			}
-
-			drawLineDDA(q0, points[i], color);
+			QPoint a; a.setX(q0.x()); a.setY(q0.y());
+			drawLineDDA(a, points[i], color);
 		}
 	}
 	drawPoints(points);
@@ -971,8 +980,9 @@ void ViewerWidget::bezierCurve(QVector<QPoint> points)
 	{
 		int n = points.size();
 
-		QVector<QVector<QPoint>> polynoms(n); //Bernsteinove bazove polynomy
-		QPoint q0, q1, p; double qx, qy, px, py;
+		QVector<QVector<QPointF>> polynoms(n); //Bernsteinove bazove polynomy
+		QPointF q0, q1, p;
+		QPoint a, b; double qx, qy, px, py;
 		QColor color = QColor("blue");
 
 		qDebug() << points;
@@ -999,7 +1009,8 @@ void ViewerWidget::bezierCurve(QVector<QPoint> points)
 			}
 			
 			q1.setX(polynoms[n - 1][0].x()); q1.setY(polynoms[n - 1][0].y());
-			drawLineDDA(q0, q1, color);
+			a.setX(std::floor(q0.x())); a.setY(std::floor(q0.y())); b.setX(std::floor(q1.x())); b.setY(std::floor(q1.y()));
+			drawLineDDA(a, b, color);
 			q0.setX(q1.x()); q0.setY(q1.y());
 			polynoms.clear();
 			polynoms.resize(n);
@@ -1009,8 +1020,8 @@ void ViewerWidget::bezierCurve(QVector<QPoint> points)
 			}
 			t += deltaT;
 		}
-
-		drawLineDDA(q0, points[n - 1], color);
+		a.setX(q0.x()); a.setY(q0.y());
+		drawLineDDA(a, points[n - 1], color);
 	}
 	drawPoints(points);
 	update();
@@ -1025,8 +1036,8 @@ void ViewerWidget::coonsCurve(QVector<QPoint> points)
 	if (n < 4) { return; }
 	else
 	{
-		QPoint q0, q1; double qx, qy;
-		double deltaT = 0.0001; double t;
+		QPointF q0, q1; double qx, qy; QPoint a, b;
+		double deltaT = 0.01; double t;
 
 		for (int i = 3; i < n; i++)
 		{
@@ -1056,7 +1067,8 @@ void ViewerWidget::coonsCurve(QVector<QPoint> points)
 				qy = points[i - 3].y() * b0 + points[i - 2].y() * b1 + points[i - 1].y() * b2 + points[i].y() * b3;
 
 				q1.setX(qx); q1.setY(qy);
-				drawLineDDA(q0, q1, color);
+				a.setX(std::floor(q0.x())); a.setY(std::floor(q0.y())); b.setX(std::floor(q1.x())); b.setY(std::floor(q1.y()));
+				drawLineDDA(a, b, color);
 				q0.setX(q1.x()); q0.setY(q1.y());
 			}
 		}

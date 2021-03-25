@@ -11,6 +11,7 @@ private:
 	QRgb* data = nullptr;
 	QPainter* painter = nullptr;
 
+	QVector<QPoint> vectorEndPoints;
 	QVector<QPoint> tangentVectors;
 
 public:
